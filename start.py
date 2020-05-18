@@ -1,44 +1,73 @@
-# (batch_name, units_per_batch, cost_per_hr_per_batch)
-all_machines = [
-    ('Large', 10, 120),
-    ('XLarge', 20, 230),
-    ('2XLarge', 40, 450),
-    ('4XLarge', 80, 774),
-    ('8XLarge', 160, 1400),
-    ('10XLarge', 320, 2820)
-]
 
-capacity, total_hrs = (1150, 1)
+def allocate_machines(machines, required_capacity):
+    filtered_machines = []
+    for machine in machines:
+        machine_name, capacity, cost_per_hr = machine
+        # Filter out if cost_per_hr is not available
+        if cost_per_hr == None:
+            continue
+        cost_per_unit = cost_per_hr / capacity
+        filtered_machines.append(
+            (machine_name, capacity, cost_per_hr, cost_per_unit)
+        )
 
-print('Capacity:    {}'.format(capacity))
-print('Hours:       {}'.format(total_hrs))
+    # Sort filtered machines based on cost_per_unit
+    machine_priorities = sorted(filtered_machines, key=lambda x: x[3])
 
-# (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit)
-filtered_machines = []
-for machine in all_machines:
-    _, units_per_batch, cost_per_hr_per_batch = machine
-    if cost_per_hr_per_batch == None:
-        continue
-    cost_per_hr_per_unit = cost_per_hr_per_batch / units_per_batch
-    filtered_machines.append(
-        (*machine, cost_per_hr_per_unit)
-    )
+    allocated_machines = []
+    for machine in machine_priorities:
+        machine_name, capacity, cost_per_hr, _ = machine
+        reqd_no_of_machines = required_capacity // capacity
+        if reqd_no_of_machines == 0:
+            continue
+        required_capacity %= capacity
+        allocated_machines.append(
+            (machine_name, reqd_no_of_machines, cost_per_hr)
+        )
+    return allocated_machines
 
-# (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit)
-machine_priorities = []
-# Sort filtered machines on cost_per_hr_per_unit
-machine_priorities = sorted(filtered_machines, key=lambda x: x[3])
-print(machine_priorities)
+if __name__ == '__main__':
 
-# (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit, no_of_machines_required)
-used_machines = []
-_capacity = capacity
-for machine in machine_priorities:
-    no_of_machines_required = _capacity // machine[1]
-    if no_of_machines_required == 0:
-        continue
-    _capacity %= machine[1]
-    used_machines.append(
-        (*machine, no_of_machines_required)
-    )
-print(used_machines)
+    region_to_machines_map = {
+        # (machine_name, capacity, cost_per_hr)
+        'New York': [
+            ('Large', 10, 120),
+            ('XLarge', 20, 230),
+            ('2XLarge', 40, 450),
+            ('4XLarge', 80, 774),
+            ('8XLarge', 160, 1400),
+            ('10XLarge', 320, 2820)
+        ],
+        'India': [
+            ('Large', 10, 120),
+            ('XLarge', 20, 230),
+            ('2XLarge', 40, 450),
+            ('4XLarge', 80, 774),
+            ('8XLarge', 160, 1400),
+            ('10XLarge', 320, 2820)
+        ],
+        'China': [
+            ('Large', 10, 120),
+            ('XLarge', 20, 230),
+            ('2XLarge', 40, 450),
+            ('4XLarge', 80, 774),
+            ('8XLarge', 160, 1400),
+            ('10XLarge', 320, 2820)
+        ]
+    }
+
+    required_capacity, total_hrs = (1150, 1)
+    print('Capacity:    {}'.format(required_capacity))
+    print('Hours:       {}'.format(total_hrs))
+
+    result = []
+
+    for region, all_machines in region_to_machines_map.items():
+        allocated_machines = allocate_machines(all_machines, required_capacity)
+        result.append({
+            'region': region,
+            'machines': allocated_machines,
+            'total_cost': '$'
+        })
+
+    print(result)
