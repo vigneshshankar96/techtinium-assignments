@@ -8,21 +8,26 @@ all_machines = [
     ('10XLarge', 320, 2820)
 ]
 
-capacity, total_hrs = (1100, 12)
+capacity, total_hrs = (1150, 1)
 
 print('Capacity:    {}'.format(capacity))
 print('Hours:       {}'.format(total_hrs))
 
 # (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit)
-machine_priorities = []
+filtered_machines = []
 for machine in all_machines:
     _, units_per_batch, cost_per_hr_per_batch = machine
+    if cost_per_hr_per_batch == None:
+        continue
     cost_per_hr_per_unit = cost_per_hr_per_batch / units_per_batch
-    machine_priorities.append(
+    filtered_machines.append(
         (*machine, cost_per_hr_per_unit)
     )
-# Sort on cost_per_hr_per_unit
-machine_priorities.sort(key=lambda x: x[3])
+
+# (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit)
+machine_priorities = []
+# Sort filtered machines on cost_per_hr_per_unit
+machine_priorities = sorted(filtered_machines, key=lambda x: x[3])
 print(machine_priorities)
 
 # (batch_name, units_per_batch, cost_per_hr_per_batch, cost_per_hr_per_unit, no_of_machines_required)
