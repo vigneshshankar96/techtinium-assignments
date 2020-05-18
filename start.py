@@ -39,12 +39,12 @@ class Machine():
             self.cost_per_unit = self.cost_per_hr / self.capacity
 
 
-def allocate_machines(machines, required_capacity):
+def allocate_machines_regionally(machines, required_capacity):
+
+    # Only allocate machines that have cost_per_hr specified, ignore others
     filtered_machines = []
     for spec_tuple in machines:
         _machine = Machine(*spec_tuple)
-
-        # Only append machines that have cost_per_hr specified
         if _machine.cost_per_hr:
             filtered_machines.append(_machine)
 
@@ -54,6 +54,7 @@ def allocate_machines(machines, required_capacity):
         key=lambda machine: machine.cost_per_unit
     )
 
+    # Allocation logic
     allocated_machines = []
     for machine in machine_priorities:
         reqd_no_of_machines = required_capacity // machine.capacity
@@ -66,24 +67,26 @@ def allocate_machines(machines, required_capacity):
         )
     return allocated_machines
 
-def main(required_capacity, total_hrs):
-    results = {
-        'Output': []
-    }
 
-    for region, all_machines in REGION_TO_MACHINES_MAP.items():
+def main(required_capacity, total_hrs):
+    results = { 'Output': [] }
+
+    for region, machines_in_region in REGION_TO_MACHINES_MAP.items():
         result = {}
         result['region'] = region
         result['machines'] = []
 
-        total_cost = 0
+        regional_cost = 0
+        regionally_allocated_machines = allocate_machines_regionally(
+            machines_in_region, required_capacity
+        )
         for (
-            machine_name, reqd_no_of_machines, run_cost_per_hr
-        ) in allocate_machines(all_machines, required_capacity):
+            machine_name, reqd_no_of_machines, cost_per_hr
+        ) in regionally_allocated_machines:
             result['machines'].append((machine_name, reqd_no_of_machines))
-            total_cost += (reqd_no_of_machines * run_cost_per_hr * total_hrs)
+            regional_cost += (reqd_no_of_machines * cost_per_hr * total_hrs)
 
-        result['total_cost'] = '${}'.format(total_cost)
+        result['total_cost'] = '${}'.format(regional_cost)
         results['Output'].append(result)
 
     return results
