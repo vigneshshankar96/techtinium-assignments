@@ -1,5 +1,33 @@
 import json
 
+REGION_TO_MACHINES_MAP = {
+    # (machine_name, capacity, cost_per_hr)
+    'New York': [
+        ('Large', 10, 120),
+        ('XLarge', 20, 230),
+        ('2XLarge', 40, 450),
+        ('4XLarge', 80, 774),
+        ('8XLarge', 160, 1400),
+        ('10XLarge', 320, 2820)
+    ],
+    'India': [
+        ('Large', 10, 140),
+        # ('XLarge', 20, None),
+        ('2XLarge', 40, 413),
+        ('4XLarge', 80, 890),
+        ('8XLarge', 160, 1300),
+        ('10XLarge', 320, 2970)
+    ],
+    'China': [
+        ('Large', 10, 110),
+        ('XLarge', 20, 200),
+        # ('2XLarge', 40, None),
+        ('4XLarge', 80, 670),
+        ('8XLarge', 160, 1180),
+        # ('10XLarge', 320, None)
+    ]
+}
+
 class Machine():
     def __init__(self, name, capacity, cost_per_hr=None):
         self.name = name
@@ -7,7 +35,7 @@ class Machine():
         self.cost_per_hr = cost_per_hr
         self.cost_per_unit = None
 
-        if self.cost_per_hr != None:
+        if self.cost_per_hr is not None:
             self.cost_per_unit = self.cost_per_hr / self.capacity
 
 
@@ -38,45 +66,12 @@ def allocate_machines(machines, required_capacity):
         )
     return allocated_machines
 
-
-if __name__ == '__main__':
-    region_to_machines_map = {
-        # (machine_name, capacity, cost_per_hr)
-        'New York': [
-            ('Large', 10, 120),
-            ('XLarge', 20, 230),
-            ('2XLarge', 40, 450),
-            ('4XLarge', 80, 774),
-            ('8XLarge', 160, 1400),
-            ('10XLarge', 320, 2820)
-        ],
-        'India': [
-            ('Large', 10, 140),
-            # ('XLarge', 20, None),
-            ('2XLarge', 40, 413),
-            ('4XLarge', 80, 890),
-            ('8XLarge', 160, 1300),
-            ('10XLarge', 320, 2970)
-        ],
-        'China': [
-            ('Large', 10, 110),
-            ('XLarge', 20, 200),
-            # ('2XLarge', 40, None),
-            ('4XLarge', 80, 670),
-            ('8XLarge', 160, 1180),
-            # ('10XLarge', 320, None)
-        ]
-    }
-
-    required_capacity, total_hrs = (1150, 1)
-    print('Capacity:    {}'.format(required_capacity))
-    print('Hours:       {}'.format(total_hrs))
-
+def main(required_capacity, total_hrs):
     results = {
         'Output': []
     }
 
-    for region, all_machines in region_to_machines_map.items():
+    for region, all_machines in REGION_TO_MACHINES_MAP.items():
         result = {}
         result['region'] = region
         result['machines'] = []
@@ -91,5 +86,15 @@ if __name__ == '__main__':
         result['total_cost'] = '${}'.format(total_cost)
         results['Output'].append(result)
 
-    # print(results)
+    return results
+
+
+if __name__ == '__main__':
+
+    required_capacity, total_hrs = (1150, 1)
+    print('Capacity:    {}'.format(required_capacity))
+    print('Hours:       {}'.format(total_hrs))
+
+    results = main(required_capacity, total_hrs)
+
     print(json.dumps(results, indent=4))
