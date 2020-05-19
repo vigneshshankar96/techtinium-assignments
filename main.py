@@ -66,7 +66,7 @@ def allocate_machines_regionally(machines, required_capacity):
     return allocated_machines
 
 
-def main(required_capacity, total_hrs):
+def allocate_machines(required_capacity, total_hrs):
     results = { 'Output': [] }
 
     for region, machines_in_region in REGION_TO_MACHINES_MAP.items():
@@ -96,6 +96,6 @@ if __name__ == '__main__':
     print('Capacity:    {}'.format(required_capacity))
     print('Hours:       {}'.format(total_hrs))
 
-    results = main(required_capacity, total_hrs)
+    results = allocate_machines(required_capacity, total_hrs)
 
     print(json.dumps(results, indent=4))
