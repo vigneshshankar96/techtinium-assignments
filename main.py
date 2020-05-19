@@ -28,6 +28,7 @@ REGION_TO_MACHINES_MAP = {
     ]
 }
 
+
 class Machine():
     def __init__(self, name, capacity, cost_per_hr=None):
         self.name = name
@@ -40,20 +41,17 @@ class Machine():
 
 
 def allocate_machines_regionally(machines, required_capacity):
-
     # Only allocate machines that have cost_per_hr specified, ignore others
     filtered_machines = []
     for spec_tuple in machines:
         _machine = Machine(*spec_tuple)
         if _machine.cost_per_hr:
             filtered_machines.append(_machine)
-
     # Prioritise machines with least cost_per_unit
     machine_priorities = sorted(
         filtered_machines,
         key=lambda machine: machine.cost_per_unit
     )
-
     # Allocation logic
     allocated_machines = []
     for machine in machine_priorities:
@@ -76,17 +74,17 @@ def main(required_capacity, total_hrs):
         result['region'] = region
         result['machines'] = []
 
-        regional_cost = 0
-        regionally_allocated_machines = allocate_machines_regionally(
+        cost_by_region = 0
+        machines_allocated_by_region = allocate_machines_regionally(
             machines_in_region, required_capacity
         )
         for (
             machine_name, reqd_no_of_machines, cost_per_hr
-        ) in regionally_allocated_machines:
+        ) in machines_allocated_by_region:
             result['machines'].append((machine_name, reqd_no_of_machines))
-            regional_cost += (reqd_no_of_machines * cost_per_hr * total_hrs)
+            cost_by_region += (reqd_no_of_machines * cost_per_hr * total_hrs)
 
-        result['total_cost'] = '${}'.format(regional_cost)
+        result['total_cost'] = '${}'.format(cost_by_region)
         results['Output'].append(result)
 
     return results
