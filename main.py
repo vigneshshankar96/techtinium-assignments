@@ -1,4 +1,5 @@
 import json
+import re
 
 REGION_TO_MACHINES_MAP = {
     # (machine_name, capacity, cost_per_hr)
@@ -39,6 +40,11 @@ class Machine():
         if self.cost_per_hr is not None:
             self.cost_per_unit = self.cost_per_hr / self.capacity
 
+def parse_input(input_string):
+    search = re.findall(r"\d+", input_string)
+    capacity = int(search[0])
+    hours = int(search[1])
+    return (capacity, hours)
 
 def allocate_machines_regionally(machines, required_capacity):
     # Only allocate machines that have cost_per_hr specified, ignore others
@@ -92,7 +98,9 @@ def allocate_machines(required_capacity, total_hrs):
 
 if __name__ == '__main__':
 
-    required_capacity, total_hrs = (1150, 1)
+    required_capacity, total_hrs = parse_input('Capacity of 1150 units for 1 Hour')
+    # required_capacity, total_hrs = (1150, 1)
+
     print('Capacity:    {}'.format(required_capacity))
     print('Hours:       {}'.format(total_hrs))
 
